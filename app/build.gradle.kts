@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -51,4 +52,34 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+
+    // Room: local task storage
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
+// MVVM and lifecycle-aware state
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+
+// Navigation between Compose screens
+    implementation(libs.androidx.navigation.compose)
+
+// Retrofit: simulated dispatch requests
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+
+// Google Maps and technician location
+    implementation(libs.google.maps.compose)
+    implementation(libs.google.play.services.location)
+
+// Asynchronous database, network, and location operations
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.play.services)
+}
+
+// Tells Room where to export its database schema, which records the database structure.
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
