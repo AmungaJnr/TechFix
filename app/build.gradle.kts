@@ -1,7 +1,19 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+}
+
+val techFixLocalProperties = Properties().apply {
+    val propertiesFile = rootProject.file("local.properties")
+
+    if (propertiesFile.exists()) {
+        propertiesFile.inputStream().use { input ->
+            load(input)
+        }
+    }
 }
 
 android {
@@ -18,6 +30,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        manifestPlaceholders["MAPS_API_KEY"] =
+            techFixLocalProperties.getProperty("MAPS_API_KEY", "")
     }
 
     buildTypes {
@@ -77,6 +92,8 @@ dependencies {
 // Asynchronous database, network, and location operations
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.play.services)
+
+    implementation("androidx.compose.material:material-icons-core")
 }
 
 // Tells Room where to export its database schema, which records the database structure.
