@@ -1,4 +1,4 @@
-package com.cst3115.enterprise.techfix.data.local
+package com.cst3115.enterprise.techfix.Data.local
 
 import android.content.Context
 import androidx.room.Database
