@@ -68,6 +68,7 @@ private fun TechFixApp(
     val isLoading by taskViewModel.isLoading.collectAsStateWithLifecycle()
     val isSaving by taskViewModel.isSaving.collectAsStateWithLifecycle()
     val errorMessage by taskViewModel.errorMessage.collectAsStateWithLifecycle()
+    val dispatchState by taskViewModel.dispatchState.collectAsStateWithLifecycle()
 
     Scaffold(
         // Each screen handles its own top system inset.
@@ -157,6 +158,8 @@ private fun TechFixApp(
                     isSaving = isSaving,
                     errorMessage = errorMessage,
                     onDismissError = taskViewModel::clearError,
+                    dispatchState = dispatchState,
+                    onSendDispatchUpdate = taskViewModel::sendDemoDispatchUpdate,
                     onCompleteTask = { taskId, notes, onSuccess ->
                         taskViewModel.completeTask(
                             taskId = taskId,
