@@ -23,6 +23,7 @@ import com.cst3115.enterprise.techfix.Data.local.TaskEntity
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import com.cst3115.enterprise.techfix.ui.viewmodel.DispatchUiState
 
 /**
  * Displays daily workload, search, filters, and task details.
@@ -35,6 +36,8 @@ fun TodayScreen(
     isLoading: Boolean,
     isSaving: Boolean,
     errorMessage: String?,
+    dispatchState: DispatchUiState,
+    onSendDispatchUpdate: () -> Unit,
     onDismissError: () -> Unit,
     onCompleteTask: (Long, String, () -> Unit) -> Unit
 ) {
@@ -118,6 +121,14 @@ fun TodayScreen(
                     total = tasks.size,
                     completed = completedCount,
                     pending = pendingCount
+                )
+            }
+
+            item {
+                DispatchStatusCard(
+                    state = dispatchState,
+                    enabled = !isLoading && !isSaving,
+                    onSend = onSendDispatchUpdate
                 )
             }
 

@@ -3,13 +3,18 @@ package com.cst3115.enterprise.techfix.Data.data
 import com.cst3115.enterprise.techfix.Data.local.TaskDao
 import com.cst3115.enterprise.techfix.Data.local.TaskEntity
 import kotlinx.coroutines.flow.Flow
+import com.cst3115.enterprise.techfix.Data.remote.DispatchApi
+import com.cst3115.enterprise.techfix.Data.remote.DispatchUpdateRequest
+import com.cst3115.enterprise.techfix.Data.remote.RetrofitClient
+import kotlinx.coroutines.flow.first
 
 /**
  * Provides a single access point for task data.
  * Screens and ViewModels do not access the DAO directly.
  */
 class TaskRepository(
-    private val taskDao: TaskDao
+    private val taskDao: TaskDao,
+    private val dispatchApi: DispatchApi = RetrofitClient.api
 ) {
 
     fun observeTasksForDate(date: String): Flow<List<TaskEntity>> {
@@ -116,5 +121,34 @@ class TaskRepository(
             date = date,
             tasks = demoTasks
         )
+    }
+
+    /**
+     * Reads a fresh database snapshot and sends a simulated daily update.
+     * Returns the acknowledgement ID supplied by the test API.
+     */
+    suspend fun sendDemoDispatchUpdate(date: String): Int {
+        val dailyTasks = taskDao.observeTasksForDate(date).first()
+
+        val completed = dailyTasks.count { it.isCompleted }
+        val pending = dailyTasks.size - completed
+
+        val request = DispatchUpdateRequest(
+            title = "TechFix demo workload update: $date",
+            body = "Assigned: ${dailyTasks.size}; " +
+                    "Pending: $pending; Completed: $completed"
+        )
+
+        val response = dispatchApi.sendDemoUpdate(request)
+
+        val responseId = checkNotNull(response.id) {
+            "The server did not acknowledge the demo update."
+        }
+
+        check(responseId > 0) {
+            "The server returned an invalid acknowledgement."
+        }
+
+        return responseId
     }
 }
