@@ -1,9 +1,10 @@
-package com.cst3115.enterprise.techfix.data.local
+package com.cst3115.enterprise.techfix.Data.local
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
+import androidx.room.Transaction
 
 /**
  * Defines the database operations available for service tasks.
@@ -63,4 +64,26 @@ interface TaskDao {
         notes: String,
         completedAt: Long
     ): Int
+
+    /**
+     * Counts tasks for a particular date.
+     */
+    @Query("SELECT COUNT(*) FROM tasks WHERE scheduledDate = :date")
+    suspend fun countTasksForDate(date: String): Int
+
+    /**
+     * Adds demonstration tasks only when the selected day has no tasks.
+     * The transaction keeps the check and inserts together.
+     */
+    @Transaction
+    suspend fun seedTasksIfEmpty(
+        date: String,
+        tasks: List<TaskEntity>
+    ) {
+        if (countTasksForDate(date) == 0) {
+            tasks.forEach { task ->
+                insertTask(task)
+            }
+        }
+    }
 }

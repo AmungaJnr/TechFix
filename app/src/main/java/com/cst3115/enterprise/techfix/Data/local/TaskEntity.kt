@@ -1,4 +1,4 @@
-package com.cst3115.enterprise.techfix.data.local
+package com.cst3115.enterprise.techfix.Data.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
