@@ -33,6 +33,10 @@ fun AddTaskScreen(
     var priority by rememberSaveable { mutableStateOf("Normal") }
     var submitted by rememberSaveable { mutableStateOf(false) }
 
+    var showLocationPicker by rememberSaveable {
+        mutableStateOf(false)
+    }
+
     val latitude = latitudeText.trim().toDoubleOrNull()
     val longitude = longitudeText.trim().toDoubleOrNull()
 
@@ -49,6 +53,22 @@ fun AddTaskScreen(
     val descriptionError = submitted && jobDescription.isBlank()
     val latitudeError = submitted && !latitudeValid
     val longitudeError = submitted && !longitudeValid
+
+    if (showLocationPicker) {
+        LocationPickerDialog(
+            initialLatitude = latitude,
+            initialLongitude = longitude,
+            onDismiss = {
+                showLocationPicker = false
+            },
+            onLocationSelected = { selectedLatitude, selectedLongitude ->
+                latitudeText = selectedLatitude.toString()
+                longitudeText = selectedLongitude.toString()
+                showLocationPicker = false
+                onDismissError()
+            }
+        )
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
@@ -205,11 +225,21 @@ fun AddTaskScreen(
                     )
 
                     Text(
-                        text = "Enter coordinates for the service address. " +
-                                "Ottawa coordinates are approximately 45.42, -75.69.",
+                        text = "Choose the service location on the map, " +
+                                "or enter its coordinates below.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+
+                    OutlinedButton(
+                        onClick = {
+                            showLocationPicker = true
+                        },
+                        enabled = !isSaving,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Choose on map")
+                    }
 
                     TaskFormField(
                         value = latitudeText,
